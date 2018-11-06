@@ -1,21 +1,28 @@
 const path = require('path');
-const publicPath = path.join(__dirname, '/../public');
-
+const http = require('http');
 const express = require('express');
-const bodyParser = require('body-parser');
+const socketIO = require('socket.io');
+
+const publicPath = path.join(__dirname, '/../public');
+const port = process.env.PORT || 3000;
+//const bodyParser = require('body-parser');
 
 var app = express();
-const port = process.env.PORT || 3000;
+
+var server = http.createServer(app);
+var io = socketIO(server);
 
 app.use(express.static(publicPath));
 //app.use(bodyParser.json());
 
-app.listen(port, () => {   
-    console.log(`App started at port: ${port}`);
+io.on('connection', (socket) => {
+    console.log('New user connected');   
+    
+    socket.on('disconnect', () => {
+        console.log('User disconnected!');
+    });
 });
 
-
-app.get('/', (req,res,next) => {
-    res.send("Hello World!");
-})
-
+server.listen(port, () => {   
+    console.log(`App started at port: ${port}`);
+});
